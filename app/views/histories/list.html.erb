@@ -15,7 +15,7 @@
         <div class="caption">
           <h3><%= history.title %></h3>
           <small><%= time_ago_in_words(history.created_at) %> ago</small>
-          <p><%= history.user.try(:email) %> </p>
+          <small><%= history.user.email %> </small>
           <p><%= history.content.truncate(150)  %></p>
           <p> <%= link_to 'Show', history, class: "btn btn-primary" %> 
             <% if can_modify?(history) %>
@@ -31,5 +31,3 @@
 
 
 <br>
-
-

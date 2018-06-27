@@ -1,10 +1,16 @@
 class HistoriesController < ApplicationController
   before_action :set_history, only: [:show, :edit, :update, :destroy]
-
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :check_can_modify, only: [:edit, :update, :destroy]
+  helper_method :can_modify?
   # GET /histories
   # GET /histories.json
   def index
     @histories = History.all
+  end
+
+  def list
+    @histories = History.where(user: current_user)
   end
 
   # GET /histories/1
@@ -25,7 +31,7 @@ class HistoriesController < ApplicationController
   # POST /histories.json
   def create
     @history = History.new(history_params)
-
+    @history.user = current_user
     respond_to do |format|
       if @history.save
         format.html { redirect_to @history, notice: 'History was successfully created.' }
@@ -71,4 +77,13 @@ class HistoriesController < ApplicationController
     def history_params
       params.require(:history).permit(:title, :picture, :content, :remote_picture_url)
     end
+
+    def can_modify? history
+        history.user == current_user || current_user.try(:admin?)
+    end
+
+    def check_can_modify
+        redirect_to histories_url, notice: 'You cant access this operation' unless can_modify?(@history)     
+    end
+
 end
